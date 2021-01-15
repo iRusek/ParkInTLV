@@ -4,6 +4,7 @@ import pandas as pd
 
 
 def adjust_str(string):
+    # handling the online database's string flaws
     if string in ["","nan"]:
         return ""
     while string[0] in ' .,':
@@ -11,6 +12,13 @@ def adjust_str(string):
     return string.replace('‡','<br>').replace('.','<br>').replace(',','<br>')
 
 def add_to_fg(fg, lt, ln, name, dfee, nfee, comm, color, icon):
+    """ 
+    created a folium marker and adds to the Frame Group
+    inputs:
+    fg - Frame Group
+    lt, ln, name, dfee, nfee, comm - characteristics of the parking lot
+    color, icon - according to the discount
+    """
     html=html_name % (name)
     temp=adjust_str(str(dfee))
     if temp!="":
@@ -26,12 +34,13 @@ def add_to_fg(fg, lt, ln, name, dfee, nfee, comm, color, icon):
 
 url = 'https://api.tel-aviv.gov.il'
 parking = f'{url}/parking/stations'
-df = pd.read_excel("parks.xlsx")
-#colorscale = branca.colormap.linear.YlOrRd_09.scale(0, 50e3)
-#employed_series = df.set_index('FIPS_Code')['Employed_2011']
+# Tel Aviv's online database of parking lots
+df = pd.read_excel(parking)
+
 m=folium.Map(location=[32.081220, 34.775343], zoom_start=13, tiles = None, control_scale = True)
 folium.TileLayer("Stamen Terrain", name="Tel-Aviv").add_to(m)
-tooltip="%s"
+
+# html parts of the marker popup
 html_name="""<h3 align='right'>%s</h3>"""
 html_day="""<h4 align='right'>מחיר לשעות היום</h4>
 <a align='right'>%s</a>"""
@@ -40,11 +49,12 @@ html_night="""<h4 align='right'>מחיר לשעות הערב</h4>
 html_comment="""<h4 align='right'>הערות</h4>
 <a align='right'>%s</a>"""
 
-
 free="ללא תשלום"
 discount="בחניון זה ניתנת הנחת תושב"
 fg_discount=folium.FeatureGroup(name="חניונים בהנחה לתושבים")
 fg_none=folium.FeatureGroup(name="חניונים בתשלום מלא")
+
+# start adding parking lots to the Frame Groups
 for lt,ln,name,dfee,nfee,comm in zip(df['GPSLattitude'],df['GPSLongitude'],df['Name'],df['DaytimeFee'],df['NighttimeFee'],df['FeeComments']):
     if free in str(dfee):
         # free parking
@@ -64,7 +74,8 @@ for lt,ln,name,dfee,nfee,comm in zip(df['GPSLattitude'],df['GPSLongitude'],df['N
 
 m.add_child(fg_discount)
 m.add_child(fg_none)
-folium.plugins.FloatImage('https://github.com/iRusek/ParkInTLV/blob/main/images/legend.png?raw=true',bottom=10, left=1).add_to(m)
 m.add_child(folium.LayerControl())
+# add the legend
+folium.plugins.FloatImage('https://github.com/iRusek/ParkInTLV/blob/main/images/legend.png?raw=true',bottom=10, left=1).add_to(m)
 
 m.save("ParkInTLV.html")
