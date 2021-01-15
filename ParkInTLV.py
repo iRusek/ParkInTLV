@@ -37,7 +37,7 @@ parking = f'{url}/parking/stations'
 # Tel Aviv's online database of parking lots
 df = pd.read_excel(parking)
 
-m=folium.Map(location=[32.081220, 34.775343], zoom_start=13, tiles = None, control_scale = True)
+m=folium.Map(location=[32.081220, 34.775343], zoom_start=13, tiles = None)
 folium.TileLayer("Stamen Terrain", name="Tel-Aviv").add_to(m)
 
 # html parts of the marker popup
