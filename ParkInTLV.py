@@ -34,7 +34,7 @@ def add_to_fg(fg, lt, ln, name, add, dfee, nfee, comm, color, icon):
 
 url = 'https://api.tel-aviv.gov.il'
 parking = f'{url}/parking/stations'
-df = pd.read_excel('parks.xlsx')
+df = pd.read_excel(parking)
 
 m=folium.Map(location=[32.081220, 34.775343], zoom_start=13, tiles = None)
 folium.TileLayer("Stamen Terrain", name="Tel-Aviv").add_to(m)
